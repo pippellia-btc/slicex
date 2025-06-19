@@ -15,7 +15,7 @@ Implements common set operations (e.g., difference, partition, symmetric differe
 Includes a custom algorithm for efficiently finding the top-K elements within a slice
 
 - **Generic Support**:   
-All functions are built with Go generics, ensuring type safety and reusability across various comparable and ordered data types.
+All functions are built with Go generics, ensuring type safety and reusability across data types.
 
 ## Benchmarks
 
