@@ -11,8 +11,8 @@ go get github.com/pippellia-btc/slicex
 - **Efficient Set Operations**:   
 Implements common set operations (e.g., difference, partition, symmetric difference) for slices, leveraging optimized algorithms for enhanced performance compared to a map-based approach.
 
-- **Top Element Discovery**:   
-Includes a custom algorithm for efficiently finding the top-K elements within a slice
+- **Fast K-Element Selection**:   
+Includes a custom algorithm for efficiently finding the top-K and min-k elements within a slice
 
 - **Generic Support**:   
 All functions are built with Go generics, ensuring type safety and reusability across data types.
@@ -23,6 +23,7 @@ You can find the benchmarks [here](/bench.md).
 
 **TLDR**:
 - set operations: ~3x faster than the map-based approach
+- k-element selection: +2x faster then sorting the full slice
 
 ## Purpose
 

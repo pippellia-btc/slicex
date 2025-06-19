@@ -6,7 +6,7 @@ pkg: github.com/pippellia-btc/slicex
 cpu: Intel(R) Core(TM) i5-4690K CPU @ 3.50GHz
 ```
 
-## Set operations
+## Set Operations
 
 ### Unique
 ```
@@ -100,3 +100,35 @@ BenchmarkPartitionMap/size=100000-4                          362           33281
 BenchmarkPartitionMap/size=1000000-4                          26          42737413 ns/op        44564646 B/op          9 allocs/op
 ```
 
+## K-Element Selection
+
+### MinK
+```
+BenchmarkMinK/min_10/1000-4              4115961               288 ns/op               0 B/op          0 allocs/op
+BenchmarkMinK/min_10/10000-4              416628              2746 ns/op               0 B/op          0 allocs/op
+BenchmarkMinK/min_10/100000-4              42150             27978 ns/op               0 B/op          0 allocs/op
+BenchmarkMinK/min_10/1000000-4              2562            412954 ns/op               0 B/op          0 allocs/op
+
+BenchmarkMinKNaive/min_10/1000-4         1484443               806 ns/op               0 B/op          0 allocs/op
+BenchmarkMinKNaive/min_10/10000-4         151060              7806 ns/op               0 B/op          0 allocs/op
+BenchmarkMinKNaive/min_10/100000-4         15339             77716 ns/op               0 B/op          0 allocs/op
+BenchmarkMinKNaive/min_10/1000000-4         1396            803882 ns/op               0 B/op          0 allocs/op
+```
+
+### TopK
+
+```
+BenchmarkTopK/top_10/1000-4              2496135               474.8 ns/op            56 B/op          2 allocs/op
+BenchmarkTopK/top_10/10000-4              329167              3546 ns/op              56 B/op          2 allocs/op
+BenchmarkTopK/top_10/100000-4              31326             34302 ns/op              56 B/op          2 allocs/op
+BenchmarkTopK/top_10/1000000-4              2490            416383 ns/op              56 B/op          2 allocs/op
+
+BenchmarkTopKNaive/top_10/1000-4          240920              4662 ns/op               0 B/op          0 allocs/op
+BenchmarkTopKNaive/top_10/10000-4          34471             33364 ns/op               0 B/op          0 allocs/op
+BenchmarkTopKNaive/top_10/100000-4          2053            533211 ns/op               0 B/op          0 allocs/op
+BenchmarkTopKNaive/top_10/1000000-4          360           3267533 ns/op               0 B/op          0 allocs/op
+```
+
+**Note**: `TopK` is considerably slower then `MinK`, since it uses the less optimized `sort.Slice` instead of `slices.Sort` to return elements in descending order.
+
+Normally, the recommended way to sort in descending order is by calling `slices.SortFunc`, which is however extremely inefficient as you can see from the `TopKNaive` results.
