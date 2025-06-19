@@ -6,13 +6,15 @@ import (
 )
 
 // Unique removes duplicates from the input slice in-place.
-// The original slice will be modified (sorted and compacted).
+//
+// The original slice will be modified.
 func Unique[E cmp.Ordered](s []E) []E {
 	slices.Sort(s)
 	return slices.Compact(s)
 }
 
 // Intersection returns the elements present in all the provided slices.
+//
 // The original slices will be modified.
 func Intersection[E cmp.Ordered](inputs ...[]E) []E {
 	switch len(inputs) {
@@ -45,6 +47,7 @@ func Intersection[E cmp.Ordered](inputs ...[]E) []E {
 }
 
 // Union the provided slices into a single one, with no duplicates.
+//
 // The original slices will be modified.
 func Union[E cmp.Ordered](inputs ...[]E) []E {
 	var size int
@@ -66,6 +69,7 @@ func Union[E cmp.Ordered](inputs ...[]E) []E {
 }
 
 // Difference returns the elements in s1 not in s2, with no duplicates.
+//
 // The original slices will be modified.
 func Difference[E cmp.Ordered](s1, s2 []E) []E {
 	if len(s1) == 0 {
@@ -80,6 +84,7 @@ func Difference[E cmp.Ordered](s1, s2 []E) []E {
 }
 
 // Differences returns the Difference(s1,s2) and Difference(s2,s1).
+//
 // The original slices will be modified.
 func Differences[E cmp.Ordered](s1, s2 []E) ([]E, []E) {
 	if len(s1) == 0 {
@@ -94,6 +99,7 @@ func Differences[E cmp.Ordered](s1, s2 []E) ([]E, []E) {
 }
 
 // SymmetricDifference returns the elements in either s1 or s2 but not in both, with no duplicates.
+//
 // The original slices will be modified.
 func SymmetricDifference[E cmp.Ordered](s1, s2 []E) []E {
 	if len(s1) == 0 {
@@ -109,8 +115,8 @@ func SymmetricDifference[E cmp.Ordered](s1, s2 []E) []E {
 }
 
 // Partition the elements of s1 and s2 into three non-overlapping slices with no duplicates:
-//   - u1: elements uniquely in s1 (not is s2).
-//   - inter: elements in both s1 and s2.
+//   - u1: elements uniquely in s1 (not is s2)
+//   - inter: elements in both s1 and s2
 //   - u2: elements uniquely in s2 (not in s1).
 //
 // The original slices will be modified.
@@ -127,8 +133,9 @@ func Partition[E cmp.Ordered](s1, s2 []E) (u1, inter, u2 []E) {
 }
 
 // intersection returns the elements in both s1 and s2, with no duplicates.
-// The original slices will be modified.
 // Both slices are assumed to be already sorted with no duplicates.
+//
+// The original slices will be modified.
 func intersection[E cmp.Ordered](s1, s2 []E) []E {
 	var read1, read2, write int
 	for read1 < len(s1) && read2 < len(s2) {
@@ -153,8 +160,9 @@ func intersection[E cmp.Ordered](s1, s2 []E) []E {
 }
 
 // difference returns s1-s2, with no duplicates.
-// s1 will be modified.
 // Both slices are assumed to be already sorted with no duplicates.
+//
+// s1 will be modified.
 func difference[E cmp.Ordered](s1, s2 []E) []E {
 	var read1, read2, write int
 	for read1 < len(s1) && read2 < len(s2) {
@@ -187,8 +195,9 @@ func difference[E cmp.Ordered](s1, s2 []E) []E {
 }
 
 // differences returns s1-s2 and s2-s1, with no duplicates.
-// Both slices will be modified.
 // Both slices are assumed to be already sorted with no duplicates.
+//
+// Both slices will be modified.
 func differences[E cmp.Ordered](s1, s2 []E) ([]E, []E) {
 	var read1, read2, write1, write2 int
 	for read1 < len(s1) && read2 < len(s2) {
@@ -231,12 +240,13 @@ func differences[E cmp.Ordered](s1, s2 []E) ([]E, []E) {
 }
 
 // partition the elements of s1 and s2 into three non-overlapping slices with no duplicates:
-//   - elements uniquely in s1 (not is s2).
-//   - elements in both s1 and s2.
-//   - elements uniquely in s2 (not in s1).
+//   - elements uniquely in s1 (not is s2)
+//   - elements in both s1 and s2
+//   - elements uniquely in s2 (not in s1)
+//
+// Both slices are assumed to be already sorted with no duplicates.
 //
 // The original slices will be modified.
-// Both slices are assumed to be already sorted with no duplicates.
 func partition[E cmp.Ordered](s1, s2 []E) ([]E, []E, []E) {
 	var inter []E
 	var read1, read2, write1, write2 int
