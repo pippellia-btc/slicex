@@ -26,4 +26,4 @@ You can find the benchmarks [here](/bench.md).
 
 ## Purpose
 
-While Go's standard slices package provides foundational utilities, slicex aims to complement it by offering specialized and performant functions that address frequently encountered challenges in data processing. It's ideal for projects requiring highly efficient slice transformations and analytical operations.
+While Go's standard slices package provides foundational utilities, `slicex` aims to complement it by offering specialized and performant functions that address frequently encountered challenges in data processing. It's ideal for projects requiring highly efficient slice transformations.
