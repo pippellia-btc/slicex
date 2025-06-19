@@ -157,6 +157,14 @@ func init() {
 	}
 }
 
+func RandomSlice(size, max int) []int {
+	s := make([]int, size)
+	for i := range size {
+		s[i] = rand.IntN(max)
+	}
+	return s
+}
+
 func BenchmarkUnique(b *testing.B) {
 	for _, bench := range benchs {
 		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
@@ -251,6 +259,26 @@ func BenchmarkDifferencesMap(b *testing.B) {
 		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
 			for range b.N {
 				DifferencesMap(bench.s1, bench.s2)
+			}
+		})
+	}
+}
+
+func BenchmarkSymmetricDifference(b *testing.B) {
+	for _, bench := range benchs {
+		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
+			for range b.N {
+				SymmetricDifference(bench.s1, bench.s2)
+			}
+		})
+	}
+}
+
+func BenchmarkSymmetricDifferenceMap(b *testing.B) {
+	for _, bench := range benchs {
+		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
+			for range b.N {
+				SymmetricDifferenceMap(bench.s1, bench.s2)
 			}
 		})
 	}
@@ -406,12 +434,4 @@ func PartitionMap[E comparable](s1, s2 []E) ([]E, []E, []E) {
 	}
 
 	return s1[:write1], toSlice(inter), s2[:write2]
-}
-
-func RandomSlice(size, max int) []int {
-	s := make([]int, size)
-	for i := range size {
-		s[i] = rand.IntN(max)
-	}
-	return s
 }

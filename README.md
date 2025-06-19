@@ -17,6 +17,13 @@ Includes a custom algorithm for efficiently finding the top-K elements within a 
 - **Generic Support**:   
 All functions are built with Go generics, ensuring type safety and reusability across various comparable and ordered data types.
 
+## Benchmarks
+
+You can find the benchmarks [here](/bench.md).
+
+**TLDR**:
+- set operations: ~3x faster than the map-based approach
+
 ## Purpose
 
 While Go's standard slices package provides foundational utilities, slicex aims to complement it by offering specialized and performant functions that address frequently encountered challenges in data processing. It's ideal for projects requiring highly efficient slice transformations and analytical operations.
