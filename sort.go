@@ -139,6 +139,17 @@ func Pack[K comparable, V cmp.Ordered](keys []K, vals []V) Pairs[K, V] {
 	return p
 }
 
+// ToPairs converts the map into a slice of key-value [Pairs].
+func ToPairs[K comparable, V cmp.Ordered](m map[K]V) Pairs[K, V] {
+	pairs := make(Pairs[K, V], 0, len(m))
+	for k, v := range m {
+		pairs = append(pairs, Pair[K, V]{Key: k, Val: v})
+	}
+	return pairs
+}
+
+func (p Pairs[K, V]) Len() int { return len(p) }
+
 // Keys returns the slice of keys of the pairs.
 func (p Pairs[K, V]) Keys() []K {
 	keys := make([]K, len(p))
@@ -169,7 +180,14 @@ func (p Pairs[K, V]) Unpack() ([]K, []V) {
 	return keys, vals
 }
 
-func (p Pairs[K, V]) Len() int { return len(p) }
+// ToMap converts the slice of key-value [Pairs] into a map.
+func (p Pairs[K, V]) ToMap() map[K]V {
+	m := make(map[K]V, len(p))
+	for _, pair := range p {
+		m[pair.Key] = pair.Val
+	}
+	return m
+}
 
 // Min returns the minimal pair and its position.
 // It panics if p is empty.
