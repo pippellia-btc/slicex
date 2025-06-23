@@ -126,54 +126,6 @@ type Pair[K comparable, V cmp.Ordered] struct {
 
 type Pairs[K comparable, V cmp.Ordered] []Pair[K, V]
 
-func (p Pairs[K, V]) Len() int { return len(p) }
-
-// Min returns the position and value of the minimal pair.
-// It panics if p is empty.
-func (p Pairs[K, V]) Min() (int, V) {
-	if len(p) < 1 {
-		panic("slicex.Min: pairs is empty")
-	}
-
-	i, min := 0, p[0].Val
-	for j, pair := range p {
-		if pair.Val < min {
-			i = j
-			min = pair.Val
-		}
-	}
-	return i, min
-}
-
-// Max returns the position and value of the maximal pair.
-// It panics if p is empty.
-func (p Pairs[K, V]) Max() (int, V) {
-	if len(p) < 1 {
-		panic("slicex.Max: pairs is empty")
-	}
-
-	i, max := 0, p[0].Val
-	for j, pair := range p {
-		if pair.Val > max {
-			i = j
-			max = pair.Val
-		}
-	}
-	return i, max
-}
-
-// Unpack returns the slice of keys and vals that constitute pairs.
-func (p Pairs[K, V]) Unpack() ([]K, []V) {
-	keys := make([]K, len(p))
-	vals := make([]V, len(p))
-
-	for i, pair := range p {
-		keys[i] = pair.Key
-		vals[i] = pair.Val
-	}
-	return keys, vals
-}
-
 // Pack keys and vals into a [Pairs] structure. It panics if their lenghts are different.
 func Pack[K comparable, V cmp.Ordered](keys []K, vals []V) Pairs[K, V] {
 	if len(keys) != len(vals) {
@@ -185,6 +137,72 @@ func Pack[K comparable, V cmp.Ordered](keys []K, vals []V) Pairs[K, V] {
 		p[i] = Pair[K, V]{Key: keys[i], Val: vals[i]}
 	}
 	return p
+}
+
+// Keys returns the slice of keys of the pairs.
+func (p Pairs[K, V]) Keys() []K {
+	keys := make([]K, len(p))
+	for i, pair := range p {
+		keys[i] = pair.Key
+	}
+	return keys
+}
+
+// Vals returns the slice of values of the pairs.
+func (p Pairs[K, V]) Vals() []V {
+	vals := make([]V, len(p))
+	for i, pair := range p {
+		vals[i] = pair.Val
+	}
+	return vals
+}
+
+// Unpack returns the slice of keys and vals that constitute the pairs.
+func (p Pairs[K, V]) Unpack() ([]K, []V) {
+	keys := make([]K, len(p))
+	vals := make([]V, len(p))
+
+	for i, pair := range p {
+		keys[i] = pair.Key
+		vals[i] = pair.Val
+	}
+	return keys, vals
+}
+
+func (p Pairs[K, V]) Len() int { return len(p) }
+
+// Min returns the minimal pair and its position.
+// It panics if p is empty.
+func (p Pairs[K, V]) Min() (int, Pair[K, V]) {
+	if len(p) < 1 {
+		panic("slicex.Min: pairs is empty")
+	}
+
+	i, min := 0, p[0].Val
+	for j, pair := range p {
+		if pair.Val < min {
+			i = j
+			min = pair.Val
+		}
+	}
+	return i, p[i]
+}
+
+// Max returns the maximal pair and its position.
+// It panics if p is empty.
+func (p Pairs[K, V]) Max() (int, Pair[K, V]) {
+	if len(p) < 1 {
+		panic("slicex.Max: pairs is empty")
+	}
+
+	i, max := 0, p[0].Val
+	for j, pair := range p {
+		if pair.Val > max {
+			i = j
+			max = pair.Val
+		}
+	}
+	return i, p[i]
 }
 
 // SortAscending sorts the provided pairs in ascending order.
@@ -211,13 +229,13 @@ func (p Pairs[K, V]) MinK(k int) Pairs[K, V] {
 	}
 
 	mins := p[:k]
-	i, max := mins.Max()
+	i, max := mins.maxVal()
 
 	for _, e := range p[k:] {
 		if e.Val < max {
 			// swap out the biggest element with the new one
 			mins[i] = e
-			i, max = mins.Max()
+			i, max = mins.maxVal()
 		}
 	}
 
@@ -239,16 +257,38 @@ func (p Pairs[K, V]) MaxK(k int) Pairs[K, V] {
 	}
 
 	maxs := p[:k]
-	i, min := maxs.Min()
+	i, min := maxs.minVal()
 
 	for _, e := range p[k:] {
 		if e.Val > min {
 			// swap out the smallest element with the new one
 			maxs[i] = e
-			i, min = maxs.Min()
+			i, min = maxs.minVal()
 		}
 	}
 
 	maxs.SortDescending()
 	return maxs
+}
+
+func (p Pairs[K, V]) minVal() (int, V) {
+	i, min := 0, p[0].Val
+	for j, pair := range p {
+		if pair.Val < min {
+			i = j
+			min = pair.Val
+		}
+	}
+	return i, min
+}
+
+func (p Pairs[K, V]) maxVal() (int, V) {
+	i, max := 0, p[0].Val
+	for j, pair := range p {
+		if pair.Val > max {
+			i = j
+			max = pair.Val
+		}
+	}
+	return i, max
 }
