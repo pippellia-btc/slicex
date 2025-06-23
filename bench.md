@@ -61,31 +61,53 @@ BenchmarkPartition/size=1000000-4                              5         2136638
 
 ### MinK
 ```
-BenchmarkMinK/min_10/1000-4              4115961               288 ns/op               0 B/op          0 allocs/op
-BenchmarkMinK/min_10/10000-4              416628              2746 ns/op               0 B/op          0 allocs/op
-BenchmarkMinK/min_10/100000-4              42150             27978 ns/op               0 B/op          0 allocs/op
-BenchmarkMinK/min_10/1000000-4              2562            412954 ns/op               0 B/op          0 allocs/op
+BenchmarkMinK/min_10/1000-4               398395              2551 ns/op            8192 B/op          1 allocs/op
+BenchmarkMinK/min_10/10000-4               73264             16157 ns/op           81920 B/op          1 allocs/op
+BenchmarkMinK/min_10/100000-4               6452            161048 ns/op          802816 B/op          1 allocs/op
+BenchmarkMinK/min_10/1000000-4               794           1577127 ns/op         8003584 B/op          1 allocs/op
 
-BenchmarkMinKNaive/min_10/1000-4         1484443               806 ns/op               0 B/op          0 allocs/op
-BenchmarkMinKNaive/min_10/10000-4         151060              7806 ns/op               0 B/op          0 allocs/op
-BenchmarkMinKNaive/min_10/100000-4         15339             77716 ns/op               0 B/op          0 allocs/op
-BenchmarkMinKNaive/min_10/1000000-4         1396            803882 ns/op               0 B/op          0 allocs/op
+BenchmarkMinKNaive/min_10/1000-4           28508             41936 ns/op            8192 B/op          1 allocs/op
+BenchmarkMinKNaive/min_10/10000-4           1705            623221 ns/op           81920 B/op          1 allocs/op
+BenchmarkMinKNaive/min_10/100000-4           154           7946621 ns/op          802816 B/op          1 allocs/op
+BenchmarkMinKNaive/min_10/1000000-4           12          98635787 ns/op         8003584 B/op          1 allocs/op
 ```
 
 ### MaxK
 
 ```
-BenchmarkTopK/top_10/1000-4              2496135               474.8 ns/op            56 B/op          2 allocs/op
-BenchmarkTopK/top_10/10000-4              329167              3546 ns/op              56 B/op          2 allocs/op
-BenchmarkTopK/top_10/100000-4              31326             34302 ns/op              56 B/op          2 allocs/op
-BenchmarkTopK/top_10/1000000-4              2490            416383 ns/op              56 B/op          2 allocs/op
+BenchmarkMaxK/max_10/1000-4               510610              2341 ns/op            8192 B/op          1 allocs/op
+BenchmarkMaxK/max_10/10000-4               72422             16141 ns/op           81920 B/op          1 allocs/op
+BenchmarkMaxK/max_10/100000-4               8300            148120 ns/op          802816 B/op          1 allocs/op
+BenchmarkMaxK/max_10/1000000-4               709           1520936 ns/op         8003585 B/op          1 allocs/op
 
-BenchmarkTopKNaive/top_10/1000-4          240920              4662 ns/op               0 B/op          0 allocs/op
-BenchmarkTopKNaive/top_10/10000-4          34471             33364 ns/op               0 B/op          0 allocs/op
-BenchmarkTopKNaive/top_10/100000-4          2053            533211 ns/op               0 B/op          0 allocs/op
-BenchmarkTopKNaive/top_10/1000000-4          360           3267533 ns/op               0 B/op          0 allocs/op
+BenchmarkMaxKNaive/max_10/1000-4           27786             41900 ns/op            8192 B/op          1 allocs/op
+BenchmarkMaxKNaive/max_10/10000-4           1846            628455 ns/op           81920 B/op          1 allocs/op
+BenchmarkMaxKNaive/max_10/100000-4           156           7607497 ns/op          802816 B/op          1 allocs/op
+BenchmarkMaxKNaive/max_10/1000000-4           12          92690560 ns/op         8003584 B/op          1 allocs/op
 ```
 
-**Note**: `TopK` is considerably slower then `MinK`, since it uses the less optimized `sort.Slice` instead of `slices.Sort` to return elements in descending order.
+### Pairs MinK
+```
+BenchmarkPairsMinK/min_10/1000-4                  241482              4167 ns/op           16384 B/op          1 allocs/op
+BenchmarkPairsMinK/min_10/10000-4                  47922             27132 ns/op          163840 B/op          1 allocs/op
+BenchmarkPairsMinK/min_10/100000-4                  4497            253809 ns/op         1605632 B/op          1 allocs/op
+BenchmarkPairsMinK/min_10/1000000-4                  277           3970338 ns/op        16007169 B/op          1 allocs/op
 
-Normally, the recommended way to sort in descending order is by calling `slices.SortFunc`, which is however extremely inefficient as you can see from the `TopKNaive` results.
+BenchmarkPairsMinKNaive/min_10/1000-4              14551             80347 ns/op           16384 B/op          1 allocs/op
+BenchmarkPairsMinKNaive/min_10/10000-4              1038           1087295 ns/op          163840 B/op          1 allocs/op
+BenchmarkPairsMinKNaive/min_10/100000-4               81          13503583 ns/op         1605633 B/op          1 allocs/op
+BenchmarkPairsMinKNaive/min_10/1000000-4               7         168258147 ns/op        16007181 B/op          1 allocs/op
+```
+
+### Pairs MaxK
+```
+BenchmarkPairsMaxK/max_10/1000-4                  258216              4092 ns/op           16384 B/op          1 allocs/op
+BenchmarkPairsMaxK/max_10/10000-4                  40081             32371 ns/op          163840 B/op          1 allocs/op
+BenchmarkPairsMaxK/max_10/100000-4                  4582            288780 ns/op         1605632 B/op          1 allocs/op
+BenchmarkPairsMaxK/max_10/1000000-4                  290           3952423 ns/op        16007170 B/op          1 allocs/op
+
+BenchmarkPairsMaxKNaive/max_10/1000-4              14742             81194 ns/op           16384 B/op          1 allocs/op
+BenchmarkPairsMaxKNaive/max_10/10000-4              1035           1092849 ns/op          163840 B/op          1 allocs/op
+BenchmarkPairsMaxKNaive/max_10/100000-4               80          13551196 ns/op         1605632 B/op          1 allocs/op
+BenchmarkPairsMaxKNaive/max_10/1000000-4               7         165881833 ns/op        16007181 B/op          1 allocs/op
+```

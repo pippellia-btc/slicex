@@ -6,7 +6,6 @@ import (
 	"math/rand/v2"
 	"reflect"
 	"slices"
-	"strconv"
 	"testing"
 )
 
@@ -188,10 +187,10 @@ func TestPairsMaxK(t *testing.T) {
 	})
 }
 
-func toPairs[E cmp.Ordered](s []E) Pairs[string, E] {
-	p := make(Pairs[string, E], len(s))
+func toPairs[E cmp.Ordered](s []E) Pairs[int, E] {
+	p := make(Pairs[int, E], len(s))
 	for i, e := range s {
-		p[i] = Pair[string, E]{Key: strconv.Itoa(i), Val: e}
+		p[i] = Pair[int, E]{Key: i, Val: e}
 	}
 	return p
 }
