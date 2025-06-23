@@ -6,7 +6,6 @@ import (
 	"math/rand/v2"
 	"reflect"
 	"slices"
-	"sort"
 	"strconv"
 	"testing"
 )
@@ -40,20 +39,23 @@ func TestMinK(t *testing.T) {
 
 		for range iter {
 			k := rand.IntN(size)
-			s := RandomSlice(rand.IntN(size)+1, rand.IntN(size)+1)
 
-			mins := MinK(s, k)
-			expected := MinKNaive(s, k)
+			s1 := RandomFloats(rand.IntN(size) + 1)
+			s2 := make([]float64, len(s1))
+			copy(s2, s1)
+
+			mins := MinK(s1, k)
+			expected := MinKNaive(s2, k)
 
 			if !reflect.DeepEqual(mins, expected) {
-				t.Errorf("len(s) = %d; k = %d", len(s), k)
+				t.Errorf("len(s) = %d; k = %d", len(s1), k)
 				t.Fatalf("expected mins %v, got %v", expected, mins)
 			}
 		}
 	})
 }
 
-func TestTopK(t *testing.T) {
+func TestMaxK(t *testing.T) {
 	t.Run("simple", func(t *testing.T) {
 		tests := []struct {
 			s        []int
@@ -69,7 +71,7 @@ func TestTopK(t *testing.T) {
 		}
 
 		for i, test := range tests {
-			top := TopK(test.s, test.k)
+			top := MaxK(test.s, test.k)
 			if !reflect.DeepEqual(top, test.expected) {
 				t.Fatalf("test %d: expected top %v, got %v", i, test.expected, top)
 			}
@@ -82,20 +84,23 @@ func TestTopK(t *testing.T) {
 
 		for range iter {
 			k := rand.IntN(size)
-			s := RandomSlice(rand.IntN(size)+1, rand.IntN(size)+1)
 
-			top := TopK(s, k)
-			expected := TopKNaive(s, k)
+			s1 := RandomFloats(rand.IntN(size) + 1)
+			s2 := make([]float64, len(s1))
+			copy(s2, s1)
+
+			top := MaxK(s1, k)
+			expected := MaxKNaive(s2, k)
 
 			if !reflect.DeepEqual(top, expected) {
-				t.Errorf("len(s) = %d; k = %d", len(s), k)
+				t.Errorf("len(s) = %d; k = %d", len(s1), k)
 				t.Fatalf("expected top %v, got %v", expected, top)
 			}
 		}
 	})
 }
 
-func TestMinKPairs(t *testing.T) {
+func TestPairsMinK(t *testing.T) {
 	t.Run("simple", func(t *testing.T) {
 		tests := []struct {
 			pairs    Pairs[string, int]
@@ -124,21 +129,22 @@ func TestMinKPairs(t *testing.T) {
 
 		for range iter {
 			k := rand.IntN(size)
-			s := RandomSlice(rand.IntN(size)+1, rand.IntN(size)+1)
-			p := toPairs(s)
+			s := RandomFloats(rand.IntN(size) + 1)
+			p1 := toPairs(s)
+			p2 := toPairs(s)
 
-			mins := p.MinK(k)
-			expected := p.MinKNaive(k)
+			mins := p1.MinK(k)
+			expected := p2.MinKNaive(k)
 
 			if !reflect.DeepEqual(mins, expected) {
-				t.Errorf("len(p) = %d; k = %d", len(p), k)
+				t.Errorf("len(p) = %d; k = %d", len(p1), k)
 				t.Fatalf("expected mins %v, got %v", expected, mins)
 			}
 		}
 	})
 }
 
-func TestTopKPairs(t *testing.T) {
+func TestPairsMaxK(t *testing.T) {
 	t.Run("simple", func(t *testing.T) {
 		tests := []struct {
 			pairs    Pairs[string, int]
@@ -154,7 +160,7 @@ func TestTopKPairs(t *testing.T) {
 		}
 
 		for i, test := range tests {
-			top := test.pairs.TopK(test.k)
+			top := test.pairs.MaxK(test.k)
 			if !reflect.DeepEqual(top, test.expected) {
 				t.Fatalf("test %d: expected top %v, got %v", i, test.expected, top)
 			}
@@ -167,151 +173,162 @@ func TestTopKPairs(t *testing.T) {
 
 		for range iter {
 			k := rand.IntN(size)
-			s := RandomSlice(rand.IntN(size)+1, rand.IntN(size)+1)
-			p := toPairs(s)
+			s := RandomFloats(rand.IntN(size) + 1)
+			p1 := toPairs(s)
+			p2 := toPairs(s)
 
-			top := p.TopK(k)
-			expected := p.TopKNaive(k)
+			maxs := p1.MaxK(k)
+			expected := p2.MaxKNaive(k)
 
-			if !reflect.DeepEqual(top, expected) {
-				t.Errorf("len(p) = %d; k = %d", len(p), k)
-				t.Fatalf("expected mins %v, got %v", expected, top)
+			if !reflect.DeepEqual(maxs, expected) {
+				t.Errorf("len(p) = %d; k = %d", len(p1), k)
+				t.Fatalf("expected maxs %v, got %v", expected, maxs)
 			}
 		}
 	})
 }
 
-func toPairs(s []int) Pairs[string, int] {
-	p := make(Pairs[string, int], len(s))
+func toPairs[E cmp.Ordered](s []E) Pairs[string, E] {
+	p := make(Pairs[string, E], len(s))
 	for i, e := range s {
-		p[i] = Pair[string, int]{Key: strconv.Itoa(e), Val: e}
+		p[i] = Pair[string, E]{Key: strconv.Itoa(i), Val: e}
 	}
 	return p
 }
 
+func RandomFloats(size int) []float64 {
+	s := make([]float64, size)
+	for i := range size {
+		s[i] = rand.Float64()
+	}
+	return s
+}
+
 // -------------------------------- benchmarks --------------------------------
 
-func BenchmarkSort(b *testing.B) {
-	for _, bench := range benchs {
-		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
-			for range b.N {
-				slices.Sort(bench.s1)
-			}
-		})
+var (
+	SortSizes  = []int{1000, 10_000, 100_000, 1_000_000}
+	SortBenchs [][]float64
+)
+
+// init generates random slices of ints for the benchmarks
+func init() {
+	for _, size := range SortSizes {
+		SortBenchs = append(SortBenchs, RandomFloats(size))
 	}
 }
 
-func BenchmarkSortAndReverse(b *testing.B) {
-	for _, bench := range benchs {
-		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
+func BenchmarkSortDescending(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("size=%d", len(bench)), func(b *testing.B) {
 			for range b.N {
-				slices.Sort(bench.s1)
-				slices.Reverse(bench.s1)
+				c := make([]float64, len(bench))
+				copy(c, bench)
+				SortDescending(c)
 			}
 		})
 	}
 }
 
 func BenchmarkSortFunc(b *testing.B) {
-	for _, bench := range benchs {
-		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("size=%d", len(bench)), func(b *testing.B) {
 			for range b.N {
-				slices.SortFunc(bench.s1, func(a, b int) int { return a - b })
-			}
-		})
-	}
-}
-
-func BenchmarkSortSlice(b *testing.B) {
-	for _, bench := range benchs {
-		s := bench.s1
-		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
-			for range b.N {
-				sort.Slice(s, func(i, j int) bool { return s[i] > s[j] })
+				c := make([]float64, len(bench))
+				copy(c, bench)
+				slices.SortFunc(c, func(a, b float64) int { return cmp.Compare(b, a) })
 			}
 		})
 	}
 }
 
 func BenchmarkMinK(b *testing.B) {
-	for _, bench := range benchs {
-		b.Run(fmt.Sprintf("min_10/%d", bench.size), func(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("min_10/%d", len(bench)), func(b *testing.B) {
 			for range b.N {
-				MinK(bench.s1, 10)
+				c := make([]float64, len(bench))
+				copy(c, bench)
+				MinK(c, 10)
 			}
 		})
 	}
 }
 
 func BenchmarkMinKNaive(b *testing.B) {
-	for _, bench := range benchs {
-		b.Run(fmt.Sprintf("min_10/%d", bench.size), func(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("min_10/%d", len(bench)), func(b *testing.B) {
 			for range b.N {
-				MinKNaive(bench.s1, 10)
+				c := make([]float64, len(bench))
+				copy(c, bench)
+				MinKNaive(c, 10)
 			}
 		})
 	}
 }
 
-func BenchmarkTopK(b *testing.B) {
-	for _, bench := range benchs {
-		b.Run(fmt.Sprintf("top_10/%d", bench.size), func(b *testing.B) {
+func BenchmarkMaxK(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("max_10/%d", len(bench)), func(b *testing.B) {
 			for range b.N {
-				TopK(bench.s1, 10)
+				c := make([]float64, len(bench))
+				copy(c, bench)
+				MaxK(c, 10)
 			}
 		})
 	}
 }
 
-func BenchmarkTopKNaive(b *testing.B) {
-	for _, bench := range benchs {
-		b.Run(fmt.Sprintf("top_10/%d", bench.size), func(b *testing.B) {
+func BenchmarkMaxKNaive(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("max_10/%d", len(bench)), func(b *testing.B) {
 			for range b.N {
-				TopKNaive(bench.s1, 10)
+				c := make([]float64, len(bench))
+				copy(c, bench)
+				MaxKNaive(c, 10)
 			}
 		})
 	}
 }
 
-func BenchmarkMinKPairs(b *testing.B) {
-	for _, bench := range benchs {
-		p := toPairs(bench.s1)
-		b.Run(fmt.Sprintf("min_10/%d", bench.size), func(b *testing.B) {
+func BenchmarkPairsMinK(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("min_10/%d", len(bench)), func(b *testing.B) {
 			for range b.N {
+				p := toPairs(bench)
 				p.MinK(10)
 			}
 		})
 	}
 }
 
-func BenchmarkMinKPairsNaive(b *testing.B) {
-	for _, bench := range benchs {
-		p := toPairs(bench.s1)
-		b.Run(fmt.Sprintf("min_10/%d", bench.size), func(b *testing.B) {
+func BenchmarkPairsMinKNaive(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("min_10/%d", len(bench)), func(b *testing.B) {
 			for range b.N {
+				p := toPairs(bench)
 				p.MinKNaive(10)
 			}
 		})
 	}
 }
 
-func BenchmarkTopKPairs(b *testing.B) {
-	for _, bench := range benchs {
-		p := toPairs(bench.s1)
-		b.Run(fmt.Sprintf("top_10/%d", bench.size), func(b *testing.B) {
+func BenchmarkPairsMaxK(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("max_10/%d", len(bench)), func(b *testing.B) {
 			for range b.N {
-				p.TopK(10)
+				p := toPairs(bench)
+				p.MaxK(10)
 			}
 		})
 	}
 }
 
-func BenchmarkTopKPairsNaive(b *testing.B) {
-	for _, bench := range benchs {
-		p := toPairs(bench.s1)
-		b.Run(fmt.Sprintf("top_10/%d", bench.size), func(b *testing.B) {
+func BenchmarkPairsMaxKNaive(b *testing.B) {
+	for _, bench := range SortBenchs {
+		b.Run(fmt.Sprintf("max_10/%d", len(bench)), func(b *testing.B) {
 			for range b.N {
-				p.TopKNaive(10)
+				p := toPairs(bench)
+				p.MaxKNaive(10)
 			}
 		})
 	}
@@ -331,16 +348,20 @@ func MinKNaive[E cmp.Ordered](s []E, k int) []E {
 	return s[:k]
 }
 
-func TopKNaive[E cmp.Ordered](s []E, k int) []E {
+func MaxKNaive[E cmp.Ordered](s []E, k int) []E {
 	if k < 1 || len(s) == 0 {
 		return nil
 	}
 
-	slices.SortFunc(s, descending)
+	slices.Sort(s)
 	if k >= len(s) {
+		slices.Reverse(s)
 		return s
 	}
-	return s[:k]
+
+	top := s[len(s)-k:]
+	slices.Reverse(top)
+	return top
 }
 
 func (p Pairs[K, V]) MinKNaive(k int) Pairs[K, V] {
@@ -355,7 +376,7 @@ func (p Pairs[K, V]) MinKNaive(k int) Pairs[K, V] {
 	return p[:k]
 }
 
-func (p Pairs[K, V]) TopKNaive(k int) Pairs[K, V] {
+func (p Pairs[K, V]) MaxKNaive(k int) Pairs[K, V] {
 	if k < 1 || len(p) == 0 {
 		return nil
 	}
@@ -366,8 +387,6 @@ func (p Pairs[K, V]) TopKNaive(k int) Pairs[K, V] {
 	}
 	return p[:k]
 }
-
-func descending[E cmp.Ordered](a, b E) int { return cmp.Compare(b, a) }
 
 func ascendingPairs[K comparable, V cmp.Ordered](a, b Pair[K, V]) int {
 	return cmp.Compare(a.Val, b.Val)

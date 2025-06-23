@@ -2,10 +2,20 @@ package slicex
 
 import (
 	"cmp"
-	"sort"
 
 	"slices"
 )
+
+// SortAscending sorts the provided slice in ascending order.
+func SortAscending[E cmp.Ordered](s []E) {
+	slices.Sort(s)
+}
+
+// SortDescending sorts the provided slice in descending order.
+func SortDescending[E cmp.Ordered](s []E) {
+	slices.Sort(s)
+	slices.Reverse(s)
+}
 
 // MinK returns the k smallest elements in the slice, sorted in ascending order.
 //
@@ -35,34 +45,34 @@ func MinK[E cmp.Ordered](s []E, k int) []E {
 	return mins
 }
 
-// TopK returns the k biggest elements in the slice, sorted in descending order.
+// MaxK returns the k biggest elements in the slice, sorted in descending order.
 //
 // The original slice will be modified.
-func TopK[E cmp.Ordered](s []E, k int) []E {
+func MaxK[E cmp.Ordered](s []E, k int) []E {
 	if k < 1 || len(s) == 0 {
 		return nil
 	}
 
-	// found that sort.Slice is faster then slices.SortFunc, see benchmarks
-
 	if k >= len(s) {
-		sort.Slice(s, func(i, j int) bool { return s[i] > s[j] })
+		slices.Sort(s)
+		slices.Reverse(s)
 		return s
 	}
 
-	top := s[:k]
-	i, min := Min(top)
+	maxs := s[:k]
+	i, min := Min(maxs)
 
 	for _, e := range s[k:] {
 		if e > min {
 			// swap out the smallest element with the new one
-			top[i] = e
-			i, min = Min(top)
+			maxs[i] = e
+			i, min = Min(maxs)
 		}
 	}
 
-	sort.Slice(top, func(i, j int) bool { return s[i] > s[j] })
-	return top
+	slices.Sort(maxs)
+	slices.Reverse(maxs)
+	return maxs
 }
 
 // Min returns the position and value of the minimal element in s.
@@ -100,7 +110,7 @@ func Max[E cmp.Ordered](s []E) (int, E) {
 }
 
 // Pair represents a key-value pair, optimized for scenarios where sorting
-// or k-element selection (TopK/MinK) is performed based solely on the Val field.
+// or k-element selection (MaxK/MinK) is performed based solely on the Val field.
 //
 // The Key field serves as an identifier to retrieve additional and potentially
 // large associated data from an external source after sorting/selection is complete.
@@ -108,7 +118,7 @@ func Max[E cmp.Ordered](s []E) (int, E) {
 // This design prioritizes performance by minimizing the data that needs to be
 // moved and compared during sort and k-element selections.
 // For example, adding just one extra field can increase the execution
-// time of the [Pairs.TopK] method by up-to 2x.
+// time of the [Pairs.MaxK] method by up-to 2x.
 type Pair[K comparable, V cmp.Ordered] struct {
 	Key K
 	Val V
@@ -177,6 +187,16 @@ func Pack[K comparable, V cmp.Ordered](keys []K, vals []V) Pairs[K, V] {
 	return p
 }
 
+// SortAscending sorts the provided pairs in ascending order.
+func (p Pairs[K, V]) SortAscending() {
+	slices.SortFunc(p, func(p1, p2 Pair[K, V]) int { return cmp.Compare(p1.Val, p2.Val) })
+}
+
+// SortAscending sorts the provided pairs in ascending order.
+func (p Pairs[K, V]) SortDescending() {
+	slices.SortFunc(p, func(p1, p2 Pair[K, V]) int { return cmp.Compare(p2.Val, p1.Val) })
+}
+
 // MinK returns the k smallest pairs by value, sorted in ascending order.
 //
 // The original pairs will be modified.
@@ -186,7 +206,7 @@ func (p Pairs[K, V]) MinK(k int) Pairs[K, V] {
 	}
 
 	if k >= len(p) {
-		sort.Slice(p, func(i, j int) bool { return p[i].Val < p[j].Val })
+		p.SortAscending()
 		return p
 	}
 
@@ -201,34 +221,34 @@ func (p Pairs[K, V]) MinK(k int) Pairs[K, V] {
 		}
 	}
 
-	sort.Slice(mins, func(i, j int) bool { return p[i].Val < p[j].Val })
+	mins.SortAscending()
 	return mins
 }
 
-// TopK returns the k biggest pairs by value, sorted in descending order.
+// MaxK returns the k biggest pairs by value, sorted in descending order.
 //
 // The original pairs will be modified.
-func (p Pairs[K, V]) TopK(k int) Pairs[K, V] {
+func (p Pairs[K, V]) MaxK(k int) Pairs[K, V] {
 	if k < 1 || len(p) == 0 {
 		return nil
 	}
 
 	if k >= len(p) {
-		sort.Slice(p, func(i, j int) bool { return p[i].Val > p[j].Val })
+		p.SortDescending()
 		return p
 	}
 
-	top := p[:k]
-	i, min := top.Min()
+	maxs := p[:k]
+	i, min := maxs.Min()
 
 	for _, e := range p[k:] {
 		if e.Val > min {
 			// swap out the smallest element with the new one
-			top[i] = e
-			i, min = top.Min()
+			maxs[i] = e
+			i, min = maxs.Min()
 		}
 	}
 
-	sort.Slice(top, func(i, j int) bool { return p[i].Val > p[j].Val })
-	return top
+	maxs.SortDescending()
+	return maxs
 }
