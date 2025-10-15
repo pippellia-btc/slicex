@@ -1,5 +1,31 @@
 package slicex
 
+// Include adds a new element to the slice if it is not already present.
+// Returns the updated slice. Does not modify the original slice in place.
+func Include[E comparable](s []E, new E) []E {
+	for _, e := range s {
+		if new == e {
+			return s
+		}
+	}
+	return append(s, new)
+}
+
+// Exclude removes the first instance of an element from the slice if it exists.
+// The order of elements is **not preserved**. The removed slot is zeroed for GC safety.
+func Exclude[E comparable](s []E, del E) []E {
+	for i, e := range s {
+		if e == del {
+			var zero E
+			var last = len(s) - 1
+
+			s[i], s[last] = s[last], zero
+			return s[:last]
+		}
+	}
+	return s
+}
+
 // Unique returns a new slice with no duplicates, preserving the order of elements.
 func Unique[E comparable](s []E) []E {
 	seen := make(map[E]struct{}, len(s))

@@ -7,6 +7,46 @@ import (
 	"testing"
 )
 
+func TestInclude(t *testing.T) {
+	tests := []struct {
+		slice    []int
+		element  int
+		expected []int
+	}{
+		{slice: nil, element: 5, expected: []int{5}},
+		{slice: []int{}, element: 5, expected: []int{5}},
+		{slice: []int{1, 2, 0}, element: 5, expected: []int{1, 2, 0, 5}},
+		{slice: []int{1, 2, 0, 3, 1, 0}, element: 3, expected: []int{1, 2, 0, 3, 1, 0}},
+	}
+
+	for i, test := range tests {
+		result := Include(test.slice, test.element)
+		if !reflect.DeepEqual(result, test.expected) {
+			t.Errorf("test %d: expected %v, got %v", i, test.expected, result)
+		}
+	}
+}
+
+func TestExclude(t *testing.T) {
+	tests := []struct {
+		slice    []int
+		element  int
+		expected []int
+	}{
+		{slice: nil, element: 5, expected: nil},
+		{slice: []int{}, element: 5, expected: []int{}},
+		{slice: []int{1, 2, 0}, element: 5, expected: []int{1, 2, 0}},
+		{slice: []int{1, 2, 0, 3, 4}, element: 0, expected: []int{1, 2, 4, 3}},
+	}
+
+	for i, test := range tests {
+		result := Exclude(test.slice, test.element)
+		if !reflect.DeepEqual(result, test.expected) {
+			t.Errorf("test %d: expected %v, got %v", i, test.expected, result)
+		}
+	}
+}
+
 func TestUnique(t *testing.T) {
 	tests := []struct {
 		slice    []int
@@ -141,6 +181,26 @@ func RandomInts(size, max int) []int {
 		s[i] = rand.IntN(max)
 	}
 	return s
+}
+
+func BenchmarkInclude(b *testing.B) {
+	for _, bench := range SetBenchs {
+		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
+			for range b.N {
+				Include(bench.s1, bench.s2[0])
+			}
+		})
+	}
+}
+
+func BenchmarkExclude(b *testing.B) {
+	for _, bench := range SetBenchs {
+		b.Run(fmt.Sprintf("size=%d", bench.size), func(b *testing.B) {
+			for range b.N {
+				Exclude(bench.s1, bench.s2[0])
+			}
+		})
+	}
 }
 
 func BenchmarkUnique(b *testing.B) {

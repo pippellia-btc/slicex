@@ -8,6 +8,20 @@ cpu: Intel(R) Core(TM) i5-4690K CPU @ 3.50GHz
 
 ## Set Operations
 
+### Include
+
+BenchmarkInclude/size=1000-4             6101217               197.1 ns/op             0 B/op          0 allocs/op
+BenchmarkInclude/size=10000-4            1890063               672.7 ns/op             0 B/op          0 allocs/op
+BenchmarkInclude/size=100000-4            287539              3914 ns/op               0 B/op          0 allocs/op
+BenchmarkInclude/size=1000000-4              810           1305764 ns/op        10002443 B/op          1 allocs/op
+
+### Exclude
+
+BenchmarkExclude/size=1000-4             3523016               338.3 ns/op             0 B/op          0 allocs/op
+BenchmarkExclude/size=10000-4             350263              3287 ns/op               0 B/op          0 allocs/op
+BenchmarkExclude/size=100000-4             33656             35490 ns/op               0 B/op          0 allocs/op
+BenchmarkExclude/size=1000000-4             2414            460442 ns/op               0 B/op          0 allocs/op
+
 ### Unique
 ```
 BenchmarkUnique/size=1000-4                34848             34632 ns/op           29980 B/op          3 allocs/op
